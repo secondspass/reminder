@@ -1,0 +1,12 @@
+defmodule Reminder.Server do
+  use GenServer
+
+  def init(state) do
+    {:ok, state, 3}
+  end
+
+  def handle_info(:timeout, state) do
+    IO.puts "timing out"
+  end
+
+end
