@@ -1,4 +1,5 @@
-# also see if date sigils can be read and written in ets and dets tables
+# REMINDERS:
+# set priorities for the events
 defmodule Reminder.Events do
 
   # def send_events_reminder(event_data) do
@@ -10,42 +11,39 @@ defmodule Reminder.Events do
 
   @doc """
   Filters out events that are non recurring if the date is today.
-  Notifies if event list is empty after filtering
+  Notifies if event list is empty after filtering. Each event is
+  of the form {event name, recurring (true/false), priority (1,2), description}.
   """
-  def filter_events({_date, []}) do
-    :no_events
-  end
-  def filter_events({date, event_list}) do
+  def filter_non_recurring_events({date, event_list}) do
     case Enum.filter(event_list,
 	  fn
-	    {_id, true, _desc} -> true
-	    {_id, false, _desc} -> if Date.utc_today() == date, do: true, else: false
+	    {_id, true, _priority, _desc} -> true
+	    {_id, false, _priority, _desc} -> if Date.utc_today() == date, do: true, else: false
 	  end
 	) do
-      [] -> :no_events
-      filtered_list -> filtered_list
+      [] -> {date, []}
+      filtered_list -> {date, filtered_list}
     end
   end
 
   @doc """
   Formulates the message to be sent as email to user.
   """
-  def create_message(event_list) do
-    event_to_msg = fn {event, _recur, desc} -> "#{event} - #{desc}" end
-    """
-    Events for today (#{Date.utc_today()}):
-
-    #{event_list |> Enum.map(event_to_msg) |> Enum.join("\n")}
-    """
+  def create_message(event_map) do
+    %Mailman.Email{
+      subject: "Reminders for today",
+      from: Application.get_env(:reminder, :from_email),
+      to: [Application.get_env(:reminder, :to_email)],
+      text: "hello",
+    }
   end
 
   @doc """
   sends the message as email to the address (defined in config)
   """
-  def send_email(message) do
-    nil
+  def send_email(email) do
+    Reminder.Mailer.deliver(email)
   end
-  
 end
 
 	    

@@ -23,4 +23,6 @@ erl_crash.dump
 reminder-*.tar
 
 *~
+/config/prod.secret.exs
+/config/dev.secret.exs
 [#]*[#]
