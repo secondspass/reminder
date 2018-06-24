@@ -22,7 +22,7 @@ defmodule Reminder.MixProject do
   defp deps do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
-      {:mailman, git: "https://github.com/mailman-elixir/mailman.git"},
+      {:mailman, git: "https://github.com/mailman-elixir/mailman.git"}
     ]
   end
 end
