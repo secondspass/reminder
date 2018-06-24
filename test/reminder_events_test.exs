@@ -92,7 +92,7 @@ defmodule ReminderEventsTest do
            ]}
         ],
         empty_event_data: [
-          {today_erl, []},
+          {next_week_erl, []},
           {{2012, next_week.month, next_week.day},
            [
              {"Event5", false, 1, "Is an event"},
@@ -105,7 +105,7 @@ defmodule ReminderEventsTest do
 
     test "today's events are filtered out correctly and final event list is produced", fixture do
       assert MapSet.equal?(
-               MapSet.new(Events.filter_events(fixture.today_data)),
+               MapSet.new(Events.filter_events(fixture.today_data, :today)),
                MapSet.new([
                  {"Event1", false, 1, "Is an event"},
                  {"Event2", true, 1, "Is also an event"},
@@ -121,7 +121,7 @@ defmodule ReminderEventsTest do
     test "tomorrow's events are filtered out correctly and final event list is produced",
          fixture do
       assert MapSet.equal?(
-               MapSet.new(Events.filter_events(fixture.tomorrow_data)),
+               MapSet.new(Events.filter_events(fixture.tomorrow_data, :tomorrow)),
                MapSet.new([
                  {"Event1", false, 1, "Is an event"},
                  {"Event2", true, 1, "Is also an event"},
@@ -136,8 +136,10 @@ defmodule ReminderEventsTest do
 
     test "next week's events are filtered out correctly and final event list is produced",
          fixture do
+      IO.inspect(Events.filter_events(fixture.next_week_data, :next_week))
+
       assert MapSet.equal?(
-               MapSet.new(Events.filter_events(fixture.next_week_data)),
+               MapSet.new(Events.filter_events(fixture.next_week_data, :next_week)),
                MapSet.new([
                  {"Event3", false, 2, "Is another event"},
                  {"Event4", true, 2, "Is yet another event"},
@@ -148,10 +150,8 @@ defmodule ReminderEventsTest do
     end
 
     test "filter_events returns :no_events if final event list is empty", fixture do
-      assert Mapset.equal?(
-               MapSet.new(Events.filter_events(fixture.empty_event_data)),
-               MapSet.new([])
-             )
+      # this test uses the next week date
+      assert Events.filter_events(fixture.empty_event_data, :next_week) == :no_events
     end
   end
 
@@ -168,26 +168,11 @@ defmodule ReminderEventsTest do
     end
 
     test "low priority events (i.e. priority 1 events) are filtered out", fixture do
-      assert Events.filter_low_priority_events({~D[2012-12-12], fixture.test_events_mixed}) ==
-               {~D[2012-12-12],
-                [
-                  {"Event2", true, 2, "Is also an event"},
-                  {"Event4", true, 2, "Is yet another event"}
-                ]}
-    end
-  end
-
-  describe "filter_empty tests:" do
-    test "filter_empty identifies if the event list is empty and replies with :no_event" do
-      assert Events.filter_empty({~D[2012-12-12], []}) == :no_events
-    end
-
-    test "filter_empty returns event item if the event list is not empty" do
-      event_item =
-        {~D[2012-12-12],
-         [{"Event1", false, 1, "Is an event"}, {"Event2", true, 2, "Is also an event"}]}
-
-      assert Events.filter_empty(event_item) == event_item
+      assert Events.filter_low_priority_events(fixture.test_events_mixed) ==
+               [
+                 {"Event2", true, 2, "Is also an event"},
+                 {"Event4", true, 2, "Is yet another event"}
+               ]
     end
   end
 
@@ -204,29 +189,16 @@ defmodule ReminderEventsTest do
     end
 
     test "event list empty", _fixture do
-      assert Events.filter_non_recurring_events({~D[2010-09-10], []}) == {~D[2010-09-10], []}
-    end
-
-    test "non recurring event in list is preserved if date is today or later", fixture do
-      assert Events.filter_non_recurring_events({Date.utc_today(), fixture.test_events}) ==
-               {Date.utc_today(), fixture.test_events}
-
-      assert Events.filter_non_recurring_events({fixture.later_date, fixture.test_events}) ==
-               {fixture.later_date, fixture.test_events}
-
-      refute Events.filter_non_recurring_events({fixture.earlier_date, fixture.test_events}) ==
-               {fixture.earlier_date, fixture.test_events}
+      assert Events.filter_non_recurring_events([]) == []
     end
 
     test "empty list returned if event list is empty after filtering", _fixture do
-      assert Events.filter_non_recurring_events(
-               {~D[2010-12-12], [{"Event1", false, 1, "Is an event"}]}
-             ) == {~D[2010-12-12], []}
+      assert Events.filter_non_recurring_events([{"Event1", false, 1, "Is an event"}]) == []
     end
 
     test "non recurring event in list is removed if date is earlier than today", fixture do
-      assert Events.filter_non_recurring_events({~D[2010-01-01], fixture.test_events}) ==
-               {~D[2010-01-01], [{"Event2", true, 2, "Is also an event"}]}
+      assert Events.filter_non_recurring_events(fixture.test_events) ==
+               [{"Event2", true, 2, "Is also an event"}]
     end
   end
 
