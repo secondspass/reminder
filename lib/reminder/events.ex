@@ -1,5 +1,3 @@
-# REMINDERS:
-# set priorities for the events
 defmodule Reminder.Events do
   # def send_events_reminder(event_data) do
   #   case filter_events(event_data) do
@@ -11,9 +9,10 @@ defmodule Reminder.Events do
   @doc """
   Takes the data retrieved from the ets table (which will be in a form something like so):
 
+  iex> today = Date.utc_today()
   iex> Reminder.Events.filter_events([
-  ...>        # today
-  ...>        {today_erl,
+  ...>        # dates are in erlang format
+  ...>        {Date.to_erl(today),
   ...>         [
   ...>           {"Event1", false, 1, "Is an event"},
   ...>           {"Event2", true, 1, "Is also an event"},
@@ -40,6 +39,25 @@ defmodule Reminder.Events do
   [{"Event1", false, 1, "Is an event"}, {"Event2", true, 1, "Is also an event"}, {"Event3", false, 2, "Is another event"}, {"Event4", true, 2, "Is yet another event"}, {"Event6", true, 1, "Is also an event"}, {"Event8", true, 2, "Is yet another event"}]
 
   and produce the the event list alone after filtering out the unwanted events.
+  
+  ## The rules for filtering out events are as follows
+  ### If key is :today
+  Referring to today's events (i.e. corresponding to today's day and month, year can be different) then
+  * if it is a past year, filter out only the non recurring events
+  * if it is the current year, don't filter out any event
+  * if it is a future year, filter out all the events
+
+  ### If key is :tomorrow
+  Referring to tomorrow's events (i.e. corresponding to tomorrow's day and month, year can be different) then
+  * if it is a past year, filter out only the non recurring events
+  * if it is the current year, don't filter out any event
+  * if it is a future year, filter out all the events
+  
+  ### If key is :next week
+  Referring to next week's events (i.e. corresponding to next week's day and month, year can be different) then
+  * if it is a past year, filter out non recurring and low priority events
+  * if it is the current year, don't filter out only the low priority events event
+  * if it is a future year, filter out all the events
   """
   def filter_events(date_event_list_tuple_list, key)
       when key in [:today, :tomorrow, :next_week] do
@@ -55,7 +73,7 @@ defmodule Reminder.Events do
   filtering events for both today and tomorrow produce the same output. because all of this years priority 1 and priority 2 events
   must be displayed, old non recurring events must be removed, and future year events must not be shown.
   """
-  def filter_pipeline(eventitem = {{year, month, day}, event_list}, :today)
+  def filter_pipeline({{year, _month, _day}, event_list}, :today)
       when is_list(event_list) do
     date = Date.utc_today()
 
@@ -66,7 +84,7 @@ defmodule Reminder.Events do
     end
   end
 
-  def filter_pipeline(eventitem = {{year, month, day}, event_list}, :tomorrow)
+  def filter_pipeline({{year, _month, _day}, event_list}, :tomorrow)
       when is_list(event_list) do
     date = Date.add(Date.utc_today(), 1)
 
@@ -77,7 +95,7 @@ defmodule Reminder.Events do
     end
   end
 
-  def filter_pipeline(eventitem = {{year, month, day}, event_list}, :next_week)
+  def filter_pipeline({{year, _month, _day}, event_list}, :next_week)
       when is_list(event_list) do
     date = Date.add(Date.utc_today(), 7)
 
@@ -123,7 +141,24 @@ defmodule Reminder.Events do
       subject: "Reminders for today",
       from: Application.get_env(:reminder, :from_email),
       to: [Application.get_env(:reminder, :to_email)],
-      text: "hello"
+      data: [event_map: event_map],
+      text: """
+    Events for today (#{Date.utc_today()}):
+
+    <%= for item <- event_map.today do %>
+    <%= elem(item, 0) %> - <%= elem(item, 3) %>
+    <% end %>
+
+    Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
+
+    Event3 - Is third event
+    Event4 - Is fourth event
+
+    Events for next week (#{Date.add(Date.utc_today(), 1)}):
+
+    Event3 - Is third event
+    Event4 - Is fourth event
+    """
     }
   end
 

@@ -136,7 +136,6 @@ defmodule ReminderEventsTest do
 
     test "next week's events are filtered out correctly and final event list is produced",
          fixture do
-      IO.inspect(Events.filter_events(fixture.next_week_data, :next_week))
 
       assert MapSet.equal?(
                MapSet.new(Events.filter_events(fixture.next_week_data, :next_week)),
@@ -205,34 +204,34 @@ defmodule ReminderEventsTest do
   test "create_message() produces correct message" do
     event_map = %{
       today:
-        {Date.utc_today(),
-         [{"Event1", false, 2, "Is an event"}, {"Event2", true, 1, "Is also an event"}]},
+         [{"Event1", false, 2, "Is an event"}, {"Event2", true, 1, "Is also an event"}],
       tomorrow:
-        {Date.add(Date.utc_today(), 1),
-         [{"Event3", false, 2, "Is third event"}, {"Event4", true, 1, "Is fourth event"}]},
+         [{"Event3", false, 2, "Is third event"}, {"Event4", true, 1, "Is fourth event"}],
       next_week:
-        {Date.add(Date.utc_today(), 7),
-         [{"Event5", false, 2, "Is fifth event"}, {"Event6", true, 2, "Is sixth event"}]}
+         [{"Event5", false, 2, "Is fifth event"}, {"Event6", true, 2, "Is sixth event"}]
     }
 
     event_message = """
-    Events for today (#{elem(event_map.today, 1)}):
+    Events for today (#{Date.utc_today()}):
 
     Event1 - Is an event
     Event2 - Is also an event
 
 
-    Events for tomorrow (#{elem(event_map.tomorrow, 1)}):
+    Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
 
     Event3 - Is third event
     Event4 - Is fourth event
 
-    Events for next week (#{elem(event_map.next_week, 1)}):
+    Events for next week (#{Date.add(Date.utc_today(), 7)}):
 
     Event3 - Is third event
     Event4 - Is fourth event
     """
 
+    IO.puts "something something configure test server. I don't bloody know (yet)"
+    Mailman.TestServer.start()
+    Reminder.Mailer.deliver(Events.create_message(event_map))
     assert %Mailman.Email{
              subject: "Reminders for today",
              text: event_message
