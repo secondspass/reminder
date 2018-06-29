@@ -136,7 +136,6 @@ defmodule ReminderEventsTest do
 
     test "next week's events are filtered out correctly and final event list is produced",
          fixture do
-
       assert MapSet.equal?(
                MapSet.new(Events.filter_events(fixture.next_week_data, :next_week)),
                MapSet.new([
@@ -201,41 +200,40 @@ defmodule ReminderEventsTest do
     end
   end
 
-  test "create_message() produces correct message" do
-    event_map = %{
-      today:
-         [{"Event1", false, 2, "Is an event"}, {"Event2", true, 1, "Is also an event"}],
-      tomorrow:
-         [{"Event3", false, 2, "Is third event"}, {"Event4", true, 1, "Is fourth event"}],
-      next_week:
-         [{"Event5", false, 2, "Is fifth event"}, {"Event6", true, 2, "Is sixth event"}]
-    }
+  describe "email tests:" do
 
-    event_message = """
-    Events for today (#{Date.utc_today()}):
+    test "create_message() produces correct message" do
+      Mailman.TestServer.start()
+      event_map = %{
+        today: [{"Event1", false, 2, "Is an event"}, {"Event2", true, 1, "Is also an event"}],
+        tomorrow: [{"Event3", false, 2, "Is third event"}, {"Event4", true, 1, "Is fourth event"}],
+        next_week: [{"Event5", false, 2, "Is fifth event"}, {"Event6", true, 2, "Is sixth event"}]
+      }
 
-    Event1 - Is an event
-    Event2 - Is also an event
+      event_message = """
+      Events for today (#{Date.utc_today()}):
 
+      Event1 - Is an event
+      Event2 - Is also an event
 
-    Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
+      Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
 
-    Event3 - Is third event
-    Event4 - Is fourth event
+      Event3 - Is third event
+      Event4 - Is fourth event
 
-    Events for next week (#{Date.add(Date.utc_today(), 7)}):
+      Events for next week (#{Date.add(Date.utc_today(), 7)}):
 
-    Event3 - Is third event
-    Event4 - Is fourth event
-    """
+      Event5 - Is fifth event
+      Event6 - Is sixth event
 
-    IO.puts "something something configure test server. I don't bloody know (yet)"
-    Mailman.TestServer.start()
-    Reminder.Mailer.deliver(Events.create_message(event_map))
-    assert %Mailman.Email{
-             subject: "Reminders for today",
-             text: event_message
-           } = Events.create_message(event_map)
+      """
+
+      {:ok, message} = Reminder.Mailer.deliver(Events.create_message(event_map))
+
+      assert %Mailman.Email{} = Mailman.Email.parse!(message)
+      assert (Mailman.Email.parse!(message)).text == event_message
+      IO.puts((Mailman.Email.parse!(message)).text)
+    end
   end
 
   test "email is configured and sent" do
