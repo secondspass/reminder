@@ -143,27 +143,21 @@ defmodule Reminder.Events do
       to: [Application.get_env(:reminder, :to_email)],
       data: [event_map: event_map],
       text: """
-    Events for today (#{Date.utc_today()}):
+      Events for today (#{Date.utc_today()}):
+    
+      <%= Enum.map(event_map.today, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end) %>
+      Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
 
-    <%= for item <- event_map.today do %>
-    <%= elem(item, 0) %> - <%= elem(item, 3) %>
-    <% end %>
+      <%= Enum.map(event_map.tomorrow, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end) %>
+      Events for next week (#{Date.add(Date.utc_today(), 7)}):
 
-    Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
-
-    Event3 - Is third event
-    Event4 - Is fourth event
-
-    Events for next week (#{Date.add(Date.utc_today(), 1)}):
-
-    Event3 - Is third event
-    Event4 - Is fourth event
-    """
+      <%= Enum.map(event_map.next_week, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end) %>
+      """
     }
   end
 
   @doc """
-  sends the message as email to the address (defined in config)
+  sends the message as email to the receiver address (defined in config files)
   """
   def send_email(email) do
     Reminder.Mailer.deliver(email)
