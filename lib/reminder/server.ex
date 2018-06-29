@@ -2,8 +2,8 @@ defmodule Reminder.Server do
   use GenServer
 
   def init(_) do
-    # NOTES: remember to change it to reflect test and prod envs
-    {:ok, db} = :dets.open_file(:reminders, [{:file, 'priv/rems.db'}])
+    {:ok, file_db} = :dets.open_file(:reminders, [{:file, Application.get_env(:reminder, :db)}])
+    db = :ets.from_dets(:ets.new(:reminders, []), file_db)
     {:ok, db}
   end
 

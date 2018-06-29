@@ -1,3 +1,4 @@
 use Mix.Config
 
-# config :mailman,
+config :reminder,
+  db: 'priv/rems_test.db'
