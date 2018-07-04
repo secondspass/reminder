@@ -232,7 +232,6 @@ defmodule ReminderEventsTest do
 
       assert %Mailman.Email{} = Mailman.Email.parse!(message)
       assert (Mailman.Email.parse!(message)).text == event_message
-      IO.puts((Mailman.Email.parse!(message)).text)
     end
   end
 
