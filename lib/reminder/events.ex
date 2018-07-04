@@ -39,7 +39,7 @@ defmodule Reminder.Events do
   [{"Event1", false, 1, "Is an event"}, {"Event2", true, 1, "Is also an event"}, {"Event3", false, 2, "Is another event"}, {"Event4", true, 2, "Is yet another event"}, {"Event6", true, 1, "Is also an event"}, {"Event8", true, 2, "Is yet another event"}]
 
   and produce the the event list alone after filtering out the unwanted events.
-  
+
   ## The rules for filtering out events are as follows
   ### If key is :today
   Referring to today's events (i.e. corresponding to today's day and month, year can be different) then
@@ -52,7 +52,7 @@ defmodule Reminder.Events do
   * if it is a past year, filter out only the non recurring events
   * if it is the current year, don't filter out any event
   * if it is a future year, filter out all the events
-  
+
   ### If key is :next week
   Referring to next week's events (i.e. corresponding to next week's day and month, year can be different) then
   * if it is a past year, filter out non recurring and low priority events
@@ -144,7 +144,7 @@ defmodule Reminder.Events do
       data: [event_map: event_map],
       text: """
       Events for today (#{Date.utc_today()}):
-    
+
       <%= Enum.map(event_map.today, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end) %>
       Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
 

@@ -201,9 +201,9 @@ defmodule ReminderEventsTest do
   end
 
   describe "email tests:" do
-
     test "create_message() produces correct message" do
       Mailman.TestServer.start()
+
       event_map = %{
         today: [{"Event1", false, 2, "Is an event"}, {"Event2", true, 1, "Is also an event"}],
         tomorrow: [{"Event3", false, 2, "Is third event"}, {"Event4", true, 1, "Is fourth event"}],
@@ -231,7 +231,7 @@ defmodule ReminderEventsTest do
       {:ok, message} = Reminder.Mailer.deliver(Events.create_message(event_map))
 
       assert %Mailman.Email{} = Mailman.Email.parse!(message)
-      assert (Mailman.Email.parse!(message)).text == event_message
+      assert Mailman.Email.parse!(message).text == event_message
     end
   end
 

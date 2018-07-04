@@ -2,7 +2,9 @@ defmodule Reminder.Server do
   use GenServer
 
   def init(_) do
-    {:ok, file_db} = :dets.open_file(:reminders_dets, [{:file, Application.get_env(:reminder, :db)}])
+    {:ok, file_db} =
+      :dets.open_file(:reminders_dets, [{:file, Application.get_env(:reminder, :db)}])
+
     db = :ets.new(:reminders, [])
     :ets.from_dets(db, file_db)
     {:ok, db}
@@ -45,11 +47,11 @@ defmodule Reminder.Server do
           :ets.insert(db, {date, [eventdetails]}) && :inserted
 
         [{^date, eventlist}] ->
-	  if eventdetails not in eventlist do
+          if eventdetails not in eventlist do
             :ets.insert(db, {date, [eventdetails | eventlist]}) && :inserted
-	  else
-	    :event_already_present
-	  end
+          else
+            :event_already_present
+          end
       end
 
     {:reply, status, db}
@@ -64,5 +66,4 @@ defmodule Reminder.Server do
     :ets.to_dets(db, :reminders_dets)
     {:noreply, db}
   end
-  
 end
