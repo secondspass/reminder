@@ -58,7 +58,7 @@ defmodule Reminder.Server do
   end
 
   def handle_call({:get, day, month}, _, db) do
-    event_data = :dets.match_object(db, {{:"$1", day, month}, :"$2"})
+    event_data = :ets.match_object(db, {{:"$1", day, month}, :"$2"})
     {:reply, event_data, db}
   end
 
