@@ -62,7 +62,7 @@ defmodule ReminderServerTest do
       # since sync_to_dets is a cast (async operation), we need to force sync by calling :sys.get_state in order to properly open and check the dets to
       # see if the values from the ets were inserted
       # get_state returns the genserver state i.e. the ets table handle
-      test_ets = :sys.get_state(fixture.rem_serv) 
+      test_ets = :sys.get_state(fixture.rem_serv)
 
       # need to use the already opened dets from the genserver to check the values, hence :reminders_dets
       assert :dets.lookup(:reminders_dets, event1.date) == :ets.lookup(test_ets, event2.date)
@@ -71,6 +71,7 @@ defmodule ReminderServerTest do
     test "get_today", fixture do
       # remember, we are only testing the data retrieval. Filtering according to recurrence and priority is of no concern in the retrieval operations
       today = Date.utc_today()
+
       event = %{
         date: Date.to_erl(today),
         name: "today event #{today} #{:rand.normal()}",
@@ -78,14 +79,17 @@ defmodule ReminderServerTest do
         priority: 1,
         desc: "description #{today} #{:rand.normal()}"
       }
+
       Server.insert_event(event.date, event.name, event.recur, event.priority, event.desc)
       test_ets = :sys.get_state(fixture.rem_serv)
-      assert :ets.match_object(test_ets, {{:"$1", today.day, today.month}, :"$2"}) == Server.get_today()
-      
+
+      assert :ets.match_object(test_ets, {{:"$1", today.day, today.month}, :"$2"}) ==
+               Server.get_today()
     end
 
     test "get_tomorrow", fixture do
       tomorrow = Date.add(Date.utc_today(), 1)
+
       event = %{
         date: Date.to_erl(tomorrow),
         name: "tomorrow event #{tomorrow} #{:rand.normal()}",
@@ -93,14 +97,17 @@ defmodule ReminderServerTest do
         priority: 1,
         desc: "description #{tomorrow} #{:rand.normal()}"
       }
+
       Server.insert_event(event.date, event.name, event.recur, event.priority, event.desc)
       test_ets = :sys.get_state(fixture.rem_serv)
-      assert :ets.match_object(test_ets, {{:"$1", tomorrow.day, tomorrow.month}, :"$2"}) == Server.get_tomorrow()
-      
+
+      assert :ets.match_object(test_ets, {{:"$1", tomorrow.day, tomorrow.month}, :"$2"}) ==
+               Server.get_tomorrow()
     end
 
     test "get_next_week", fixture do
       next_week = Date.add(Date.utc_today(), 7)
+
       event = %{
         date: Date.to_erl(next_week),
         name: "next_week event #{next_week} #{:rand.normal()}",
@@ -108,10 +115,12 @@ defmodule ReminderServerTest do
         priority: 1,
         desc: "description #{next_week} #{:rand.normal()}"
       }
+
       Server.insert_event(event.date, event.name, event.recur, event.priority, event.desc)
       test_ets = :sys.get_state(fixture.rem_serv)
-      assert :ets.match_object(test_ets, {{:"$1", next_week.day, next_week.month}, :"$2"}) == Server.get_next_week()
-      
+
+      assert :ets.match_object(test_ets, {{:"$1", next_week.day, next_week.month}, :"$2"}) ==
+               Server.get_next_week()
     end
   end
 end
