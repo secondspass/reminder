@@ -27,4 +27,8 @@ defmodule Reminder do
 
     event_map |> Events.create_message() |> Events.send_email()
   end
+
+  def insert_events_from_csv do
+  end
+  
 end
