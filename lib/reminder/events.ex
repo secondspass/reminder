@@ -145,13 +145,19 @@ defmodule Reminder.Events do
       text: """
       Events for today (#{Date.utc_today()}):
 
-      <%= Enum.map(event_map.today, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end) %>
+      <%= if(is_list(event_map.today), 
+      do: Enum.map(event_map.today, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end), 
+      else: "no events") %>
       Events for tomorrow (#{Date.add(Date.utc_today(), 1)}):
 
-      <%= Enum.map(event_map.tomorrow, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end) %>
+      <%= if(is_list(event_map.tomorrow), 
+      do: Enum.map(event_map.tomorrow, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end), 
+      else: "no events") %>
       Events for next week (#{Date.add(Date.utc_today(), 7)}):
 
-      <%= Enum.map(event_map.next_week, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end) %>
+      <%= if(is_list(event_map.next_week), 
+      do: Enum.map(event_map.next_week, fn item -> elem(item, 0) <> " - " <> elem(item, 3) <> "\n" end), 
+      else: "no events") %>
       """
     }
   end
