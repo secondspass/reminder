@@ -1,0 +1,4 @@
+Date,Event name,recurring?,priority(1 or 2),event description
+1879-03-14,Albert Einstein,true,1,Birthday
+1955-07-12,Bieber Man,false,1,Birthday
+1969-11-23,Tortilla and Salsa,true,2,Wedding Anniversary
