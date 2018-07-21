@@ -6,7 +6,7 @@ defmodule ReminderServerTest do
   describe "Get events from test db:" do
     setup do
       fixture = [
-        rem_serv: elem(Server.start_link(), 1)
+        rem_serv: GenServer.whereis(:rem_server)
       ]
 
       fixture

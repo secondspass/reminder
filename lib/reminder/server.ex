@@ -7,7 +7,7 @@ defmodule Reminder.Server do
 
     db = :ets.new(:reminders, [])
     :ets.from_dets(db, file_db)
-    IO.puts "starting Server"
+    IO.puts("starting Server")
     {:ok, db}
   end
 
