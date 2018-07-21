@@ -70,7 +70,8 @@ defmodule ReminderServerTest do
     end
 
     test "get_today", fixture do
-      # remember, we are only testing the data retrieval. Filtering according to recurrence and priority is of no concern in the retrieval operations
+      # remember, we are only testing the data retrieval. Filtering according to recurrence
+      # and priority is of no concern in the retrieval operations
       today = Date.utc_today()
 
       event = %{
@@ -84,7 +85,7 @@ defmodule ReminderServerTest do
       Server.insert_event({event.date, event.name, event.recur, event.priority, event.desc})
       test_ets = :sys.get_state(fixture.rem_serv)
 
-      assert :ets.match_object(test_ets, {{:"$1", today.day, today.month}, :"$2"}) ==
+      assert :ets.match_object(test_ets, {{:"$1", today.month, today.day}, :"$2"}) ==
                Server.get_today()
     end
 
@@ -102,7 +103,7 @@ defmodule ReminderServerTest do
       Server.insert_event({event.date, event.name, event.recur, event.priority, event.desc})
       test_ets = :sys.get_state(fixture.rem_serv)
 
-      assert :ets.match_object(test_ets, {{:"$1", tomorrow.day, tomorrow.month}, :"$2"}) ==
+      assert :ets.match_object(test_ets, {{:"$1", tomorrow.month, tomorrow.day}, :"$2"}) ==
                Server.get_tomorrow()
     end
 
@@ -120,7 +121,7 @@ defmodule ReminderServerTest do
       Server.insert_event({event.date, event.name, event.recur, event.priority, event.desc})
       test_ets = :sys.get_state(fixture.rem_serv)
 
-      assert :ets.match_object(test_ets, {{:"$1", next_week.day, next_week.month}, :"$2"}) ==
+      assert :ets.match_object(test_ets, {{:"$1", next_week.month, next_week.day}, :"$2"}) ==
                Server.get_next_week()
     end
   end
