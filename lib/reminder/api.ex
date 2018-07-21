@@ -2,7 +2,6 @@ defmodule Reminder.API do
   alias Reminder.Server
   alias Reminder.Events
 
-
   def send_reminders do
     event_map = %{
       today: Server.get_today() |> Events.filter_events(:today),
@@ -15,7 +14,9 @@ defmodule Reminder.API do
 
   def insert_events_from_csv(file_location) do
     File.open(file_location, [:utf8], fn file ->
-      IO.read(file, :line) # reads and discards the first line as they are headings
+      # reads and discards the first line as they are headings
+      IO.read(file, :line)
+
       csv_to_tuples(file)
       |> Enum.map(&Server.insert_event/1)
     end)

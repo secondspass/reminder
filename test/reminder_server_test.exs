@@ -37,7 +37,7 @@ defmodule ReminderServerTest do
                event1.recur,
                event1.priority,
                event1.desc
-            } ) == :inserted
+             }) == :inserted
 
       assert Server.insert_event({
                event2.date,
