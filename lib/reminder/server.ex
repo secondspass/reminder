@@ -7,7 +7,18 @@ defmodule Reminder.Server do
 
     db = :ets.new(:reminders, [])
     :ets.from_dets(db, file_db)
+    IO.puts "starting Server"
     {:ok, db}
+  end
+
+  def child_spec(_opts) do
+    %{
+      id: Reminder.Server,
+      restart: :permanent,
+      shutdown: 5000,
+      start: {Reminder.Server, :start_link, []},
+      type: :worker
+    }
   end
 
   def start_link() do
