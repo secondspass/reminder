@@ -31,35 +31,36 @@ defmodule ReminderServerTest do
       }
 
       # insert some event for today (we have not persisted the db yet)
-      assert Server.insert_event(
+      assert Server.insert_event({
                event1.date,
                event1.name,
                event1.recur,
                event1.priority,
                event1.desc
-             ) == :inserted
+            } ) == :inserted
 
-      assert Server.insert_event(
+      assert Server.insert_event({
                event2.date,
                event2.name,
                event2.recur,
                event2.priority,
                event2.desc
-             ) == :inserted
+             }) == :inserted
 
       # check if the event above has been inserted
-      assert Server.insert_event(
+      assert Server.insert_event({
                event1.date,
                event1.name,
                event1.recur,
                event1.priority,
                event1.desc
-             ) == :event_already_present
+             }) == :event_already_present
 
       # sync ets to dets on file
       Server.sync_to_dets()
 
-      # since sync_to_dets is a cast (async operation), we need to force sync by calling :sys.get_state in order to properly open and check the dets to
+      # since sync_to_dets is a cast (async operation), we need to force sync by calling
+      # :sys.get_state in order to properly open and check the dets to
       # see if the values from the ets were inserted
       # get_state returns the genserver state i.e. the ets table handle
       test_ets = :sys.get_state(fixture.rem_serv)
@@ -80,7 +81,7 @@ defmodule ReminderServerTest do
         desc: "description #{today} #{:rand.normal()}"
       }
 
-      Server.insert_event(event.date, event.name, event.recur, event.priority, event.desc)
+      Server.insert_event({event.date, event.name, event.recur, event.priority, event.desc})
       test_ets = :sys.get_state(fixture.rem_serv)
 
       assert :ets.match_object(test_ets, {{:"$1", today.day, today.month}, :"$2"}) ==
@@ -98,7 +99,7 @@ defmodule ReminderServerTest do
         desc: "description #{tomorrow} #{:rand.normal()}"
       }
 
-      Server.insert_event(event.date, event.name, event.recur, event.priority, event.desc)
+      Server.insert_event({event.date, event.name, event.recur, event.priority, event.desc})
       test_ets = :sys.get_state(fixture.rem_serv)
 
       assert :ets.match_object(test_ets, {{:"$1", tomorrow.day, tomorrow.month}, :"$2"}) ==
@@ -116,7 +117,7 @@ defmodule ReminderServerTest do
         desc: "description #{next_week} #{:rand.normal()}"
       }
 
-      Server.insert_event(event.date, event.name, event.recur, event.priority, event.desc)
+      Server.insert_event({event.date, event.name, event.recur, event.priority, event.desc})
       test_ets = :sys.get_state(fixture.rem_serv)
 
       assert :ets.match_object(test_ets, {{:"$1", next_week.day, next_week.month}, :"$2"}) ==

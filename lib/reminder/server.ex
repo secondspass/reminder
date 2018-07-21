@@ -14,7 +14,7 @@ defmodule Reminder.Server do
     GenServer.start_link(__MODULE__, nil, name: :rem_server)
   end
 
-  def insert_event(date_erl, eventname, recurring, priority, desc) do
+  def insert_event({date_erl, eventname, recurring, priority, desc}) do
     GenServer.call(:rem_server, {:insert, date_erl, {eventname, recurring, priority, desc}})
   end
 
