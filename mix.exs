@@ -30,7 +30,8 @@ defmodule Reminder.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       {:mailman, git: "https://github.com/mailman-elixir/mailman.git"},
-      {:excoveralls, "~> 0.8", only: :test}
+      {:excoveralls, "~> 0.8", only: :test},
+      {:pre_commit, git: "https://github.com/dwyl/elixir-pre-commit.git", only: :dev}
     ]
   end
 end
