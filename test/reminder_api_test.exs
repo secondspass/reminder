@@ -17,7 +17,7 @@ defmodule ReminderAPITest do
   end
 
   test "insert events from csv into db" do
-    _rem_serv = elem(Server.start_link(), 1)
+    _ = elem(Server.start_link(), 1)
 
     assert API.insert_events_from_csv(@test_csv) == {:ok, [:inserted, :inserted, :inserted]}
 

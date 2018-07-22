@@ -2,14 +2,19 @@ defmodule Reminder.API do
   alias Reminder.Server
   alias Reminder.Events
 
-  def send_reminders do
-    event_map = %{
+  def event_map do
+    %{
       today: Server.get_today() |> Events.filter_events(:today),
       tomorrow: Server.get_tomorrow() |> Events.filter_events(:tomorrow),
       next_week: Server.get_next_week() |> Events.filter_events(:next_week)
     }
+  end
 
-    event_map |> Events.create_message() |> Events.send_email()
+  def send_reminder do
+    case Map.values(event_map()) do
+      [:no_events, :no_events, :no_events] -> IO.puts("no events to send")
+      _ -> event_map() |> Events.create_message() |> Events.send_email()
+    end
   end
 
   def insert_events_from_csv(file_location) do

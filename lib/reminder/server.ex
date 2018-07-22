@@ -8,6 +8,7 @@ defmodule Reminder.Server do
     db = :ets.new(:reminders, [])
     :ets.from_dets(db, file_db)
     IO.puts("starting Server")
+    Process.flag(:trap_exit, true)
     {:ok, db}
   end
 
@@ -76,5 +77,10 @@ defmodule Reminder.Server do
   def handle_cast(:sync, db) do
     :ets.to_dets(db, :reminders_dets)
     {:noreply, db}
+  end
+
+  def terminate(_reason, db) do
+    :ets.to_dets(db, :reminders_dets)
+    :dets.close(:reminders_dets)
   end
 end
