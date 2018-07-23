@@ -22,7 +22,7 @@ defmodule Reminder.Server do
     }
   end
 
-  def start_link() do
+  def start_link do
     GenServer.start_link(__MODULE__, nil, name: :rem_server)
   end
 

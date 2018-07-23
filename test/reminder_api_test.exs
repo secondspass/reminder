@@ -2,7 +2,6 @@ defmodule ReminderAPITest do
   use ExUnit.Case
   doctest Reminder
   alias Reminder.API
-  alias Reminder.Server
   @test_csv "./priv/exampleevents.csv"
 
   test "convert csv to list of tuples" do
@@ -17,7 +16,6 @@ defmodule ReminderAPITest do
   end
 
   test "insert events from csv into db" do
-    _ = elem(Server.start_link(), 1)
 
     assert API.insert_events_from_csv(@test_csv) == {:ok, [:inserted, :inserted, :inserted]}
 
