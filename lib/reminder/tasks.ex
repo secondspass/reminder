@@ -37,5 +37,4 @@ defmodule Reminder.Tasks.Eraser do
   task to remove obsolete events from db. runs once a month.
   """
   use Task, restart: :permanent
-
 end
