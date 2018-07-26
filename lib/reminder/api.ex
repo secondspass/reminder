@@ -26,7 +26,6 @@ defmodule Reminder.API do
       |> Enum.map(&Server.insert_event/1)
     end)
 
-    Server.sync_to_dets()
   end
 
   @doc """
