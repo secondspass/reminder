@@ -25,6 +25,8 @@ defmodule Reminder.API do
       csv_to_tuples(file)
       |> Enum.map(&Server.insert_event/1)
     end)
+
+    Server.sync_to_dets()
   end
 
   @doc """
