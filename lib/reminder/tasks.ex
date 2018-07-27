@@ -12,17 +12,17 @@ defmodule Reminder.Tasks.Sender do
   def run do
     send_time = Application.get_env(:reminder, :time, ~T[12:00:00])
 
-    cond do
-      Time.utc_now() == send_time ->
+    case Time.compare(Time.utc_now(), send_time) do
+      :eq ->
         Reminder.API.send_reminder()
         Process.sleep(@ms_24hrs - 10000)
 
-      Time.utc_now() < send_time ->
+      :lt ->
         IO.puts("current time is less than set time")
         Time.diff(send_time, Time.utc_now(), :milliseconds) |> Process.sleep()
         Reminder.API.send_reminder()
 
-      Time.utc_now() > send_time ->
+      :gt ->
         IO.puts("current time is greater than set time")
         Process.sleep(@ms_24hrs - Time.diff(Time.utc_now(), send_time))
         Reminder.API.send_reminder()
