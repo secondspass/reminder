@@ -19,12 +19,12 @@ defmodule Reminder.Tasks.Sender do
 
       :lt ->
         IO.puts("current time is less than set time")
-        Time.diff(send_time, Time.utc_now(), :milliseconds) |> Process.sleep()
+        Time.diff(send_time, Time.utc_now(), :millisecond) |> Process.sleep()
         Reminder.API.send_reminder()
 
       :gt ->
         IO.puts("current time is greater than set time")
-        Process.sleep(@ms_24hrs - Time.diff(Time.utc_now(), send_time))
+        Process.sleep(@ms_24hrs - Time.diff(Time.utc_now(), send_time, :millisecond))
         Reminder.API.send_reminder()
     end
 
