@@ -6,7 +6,7 @@ defmodule Reminder.Supervisor do
   end
 
   def init(_) do
-    children = [Reminder.Server, Reminder.Tasks.Sender]
+    children = [Reminder.Server, Reminder.Tasks.Sender, Reminder.Tasks.NotifyConnec]
     Supervisor.init(children, strategy: :one_for_one)
   end
 end

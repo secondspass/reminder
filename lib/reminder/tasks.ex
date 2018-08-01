@@ -32,9 +32,17 @@ defmodule Reminder.Tasks.Sender do
   end
 end
 
-defmodule Reminder.Tasks.Eraser do
+defmodule Reminder.Tasks.NotifyConnec do
   @moduledoc """
-  task to remove obsolete events from db. runs once a month.
+  Sends a message to the remapp.exs process that the server is ready to connect
   """
-  use Task, restart: :permanent
+  use Task, restart: :temporary
+
+  def start_link(_opts) do
+    Task.start_link(__MODULE__, :run, [])
+  end
+
+  def run do
+    send({:connec_script, :connec@localhost}, :ready)
+  end
 end

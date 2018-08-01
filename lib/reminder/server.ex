@@ -30,6 +30,13 @@ defmodule Reminder.Server do
     GenServer.call(:rem_server, {:insert, date_erl, {eventname, recurring, priority, desc}})
   end
 
+  @doc """
+  Deletes all the events from the ets table
+  """
+  def delete_all_events do
+    GenServer.call(:rem_server, :delete_all)
+  end
+
   def sync_to_dets do
     GenServer.cast(:rem_server, :sync)
   end
@@ -74,8 +81,14 @@ defmodule Reminder.Server do
     {:reply, event_data, db}
   end
 
+  def handle_call(:delete_all, _, db) do
+    :ets.delete_all_objects(db)
+    {:reply, :deleted, db}
+  end
+
   def handle_cast(:sync, db) do
     :ets.to_dets(db, :reminders_dets)
+    :dets.sync(:reminders_dets)
     {:noreply, db}
   end
 
