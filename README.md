@@ -42,4 +42,18 @@ config :mailman,
   auth: :always
 ```
 5. Run `mix do deps.get, deps.compile, compile` in the project root directory.
-6. To start the app in the background, run `env MIX_ENV=prod nohup mix run --no-halt lib/read_csv.exs --path <path to your csv file> &`
+
+# Running the app
+All interactions with the app is through the `remapp.exs` script and the csv file.
+
+1. To start the app in the background, run `elixir remapp.exs` inside the repo. If the
+   app is already started, it exits with a message.
+
+2. Once the app is started, you can add data from the csv file by running `elixir
+   remapp.exs --csv <path to csv>`. If the app is not started, the command will start
+   the app and then initialize it with the csv file.
+3. If you want to add a new event, add it to the csv file and run the above command.
+4. If you want to delete events, delete them in your csv file and then run `elixir
+   remapp.exs --reset && elixir remapp.exs --csv <path to csv>`. This is a bit of a
+   crude way to do things because it erases and rebuilds the internal ETS table from
+   scratch but eh, it's good enough for now.
