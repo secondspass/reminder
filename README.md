@@ -25,7 +25,8 @@ sent in the config file.
 3. Clone this repo
 4. Create a file called `prod.secret.exs` in the `config` directory and insert the following into the file,
 replacing the `<receiver>, <sender>, <sender password>` with the appropriate information
-(Note that this only works with gmail for now)
+(Note that this is the config for gmail, but should work with any email provider that
+provides smtp).
 ```elixir
 use Mix.Config
 
